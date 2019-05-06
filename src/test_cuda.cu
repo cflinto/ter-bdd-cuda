@@ -39,10 +39,14 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 int main(void)
 {
-    int *tab, *result;
+    int *tab, *result; // GPU
+    int *tabCPU, *resultCPU; // CPU
     
-    cudaMallocManaged(&tab, ROW_NUM*COLUMN_NUM*sizeof(int));
-    cudaMallocManaged(&result, ROW_NUM*sizeof(int));
+    tabCPU = new int[ROW_NUM*COLUMN_NUM];
+    resultCPU = new int[ROW_NUM];
+    
+    cudaMalloc(&tab, ROW_NUM*COLUMN_NUM*sizeof(int));
+    cudaMalloc(&result, ROW_NUM*sizeof(int));
     
     srand(0);
     
@@ -50,17 +54,33 @@ int main(void)
     {
         for(int row=0;row<ROW_NUM;++row)
         {
-            tab[ROW_NUM*column+row] = rand()%1000000;
+            tabCPU[ROW_NUM*column+row] = rand()%1000000;
         }
     }
     
-    //t1 = myCPUTimer();
+    cudaMemcpy(tab, tabCPU, ROW_NUM*COLUMN_NUM*sizeof(int), cudaMemcpyHostToDevice);
+    
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    
+    cudaEventRecord(start);
     
     request<<<(ROW_NUM+255)/256, 256>>>(tab, result);
-    gpuErrchk( cudaPeekAtLastError() );
-    gpuErrchk( cudaDeviceSynchronize() );
     
-    //t2 = myCPUTimer();
+    cudaEventRecord(stop);
+    
+    cudaMemcpy(resultCPU, result, ROW_NUM*sizeof(int), cudaMemcpyDeviceToHost);
+    
+    cudaEventSynchronize(stop);
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    
+    /*
+    gpuErrchk( cudaPeekAtLastError() );
+    gpuErrchk( cudaDeviceSynchronize());
+    */
+    
     
     int total = 0;
     for(int row=0;row<ROW_NUM;++row)
@@ -72,8 +92,14 @@ int main(void)
     }
     std::cout << "Total : " << total << std::endl;
     
+    
+    std::cout << milliseconds;
+    
     cudaFree(tab);
     cudaFree(result);
+    
+    delete[] resultCPU;
+    delete[] tabCPU;
       
     return 0;
 }
