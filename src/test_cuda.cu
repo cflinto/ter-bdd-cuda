@@ -104,7 +104,7 @@ int main(void)
       
     return 0;*/
     
-    float *x, *y, *d_x, *d_y;
+    int *x, *y, *d_x, *d_y;
     x = (int*)malloc(ROW_NUM*COLUMN_NUM*sizeof(int));
     y = (int*)malloc(ROW_NUM*sizeof(int));
 
@@ -126,7 +126,7 @@ int main(void)
 
     request<<<(ROW_NUM+255)/256, 256>>>(d_x, d_y);
 
-    cudaMemcpy(y, d_y, ROW_NUM*sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(y, d_y, ROW_NUM*sizeof(int), cudaMemcpyDeviceToHost);
 
     cudaFree(d_x);
     cudaFree(d_y);
