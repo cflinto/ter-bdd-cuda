@@ -39,7 +39,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 int main(void)
 {
-    int *tab, *result; // GPU
+    /*int *tab, *result; // GPU
     int *tabCPU, *resultCPU; // CPU
     
     tabCPU = (int*)malloc(ROW_NUM*COLUMN_NUM*sizeof(int));
@@ -75,7 +75,7 @@ int main(void)
     
     cudaEventSynchronize(stop);
     float milliseconds = 0;
-    cudaEventElapsedTime(&milliseconds, start, stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);*/
     
     /*
     gpuErrchk( cudaPeekAtLastError() );
@@ -83,7 +83,7 @@ int main(void)
     */
     
     
-    int total = 0;
+    /*int total = 0;
     for(int row=0;row<ROW_NUM;++row)
     {
         if(result[row])
@@ -102,5 +102,34 @@ int main(void)
     free(resultCPU);
     free(tabCPU);
       
-    return 0;
+    return 0;*/
+    
+    float *x, *y, *d_x, *d_y;
+    x = (int*)malloc(ROW_NUM*COLUMN_NUM*sizeof(int));
+    y = (int*)malloc(ROW_NUM*sizeof(int));
+
+    cudaMalloc(&d_x, ROW_NUM*COLUMN_NUM*sizeof(int));
+    cudaMalloc(&d_y, ROW_NUM*sizeof(int));
+
+    srand(0);
+    
+    for(int column=0;column<COLUMN_NUM-1;++column)
+    {
+        for(int row=0;row<ROW_NUM;++row)
+        {
+            x[ROW_NUM*column+row] = rand()%1000000;
+        }
+    }
+
+    cudaMemcpy(d_x, x, ROW_NUM*COLUMN_NUM*sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_y, y, ROW_NUM*sizeof(int), cudaMemcpyHostToDevice);
+
+    request<<<(ROW_NUM+255)/256, 256>>>(tab, result);
+
+    cudaMemcpy(y, d_y, ROW_NUM*sizeof(float), cudaMemcpyDeviceToHost);
+
+    cudaFree(d_x);
+    cudaFree(d_y);
+    free(x);
+    free(y);
 }
