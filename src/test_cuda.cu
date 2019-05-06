@@ -27,6 +27,16 @@ void request(int *tab, int *result)
     }
 }
 
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+{
+    if (code != cudaSuccess)
+    {
+        fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+        if (abort) exit(code);
+    }
+}
+
 int main(void)
 {
     int *tab, *result;
@@ -47,15 +57,15 @@ int main(void)
     //t1 = myCPUTimer();
     
     request<<<(ROW_NUM+255)/256, 256>>>(tab, result);
-    
-    cudaDeviceSynchronize();
+    gpuErrchk( cudaPeekAtLastError() );
+    gpuErrchk( cudaDeviceSynchronize() );
     
     //t2 = myCPUTimer();
     
     int total = 0;
     for(int row=0;row<ROW_NUM;++row)
     {
-        if(result[i])
+        if(result[row])
         {
             ++total;
         }
