@@ -110,6 +110,10 @@ int main(void)
 
     cudaMalloc(&d_x, ROW_NUM*COLUMN_NUM*sizeof(int));
     cudaMalloc(&d_y, ROW_NUM*sizeof(int));
+    
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
 
     srand(0);
     
@@ -124,9 +128,28 @@ int main(void)
     cudaMemcpy(d_x, x, ROW_NUM*COLUMN_NUM*sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_y, y, ROW_NUM*sizeof(int), cudaMemcpyHostToDevice);
 
+    cudaEventRecord(start);
     request<<<(ROW_NUM+255)/256, 256>>>(d_x, d_y);
+    cudaEventRecord(stop);
 
     cudaMemcpy(y, d_y, ROW_NUM*sizeof(int), cudaMemcpyDeviceToHost);
+    
+    cudaEventSynchronize(stop);
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    
+    int total = 0;
+    for(int row=0;row<ROW_NUM;++row)
+    {
+        if(resultCPU[row])
+        {
+            ++total;
+        }
+    }
+    std::cout << "Total : " << total << std::endl;
+    
+    
+    std::cout << milliseconds;
 
     cudaFree(d_x);
     cudaFree(d_y);
