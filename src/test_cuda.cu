@@ -42,13 +42,11 @@ int main(void)
     cudaMallocManaged(&tab, ROW_NUM*COLUMN_NUM*sizeof(int));
     cudaMallocManaged(&result, ROW_NUM*sizeof(int));
     
-    srand(0);
-    
     for(int column=0;column<COLUMN_NUM-1;++column)
     {
         for(int row=0;row<ROW_NUM;++row)
         {
-            tab[ROW_NUM*column+row] = rand()%1000000;
+            tab[ROW_NUM*column+row] = 23*row+column+13*row*row;
         }
     }
     
