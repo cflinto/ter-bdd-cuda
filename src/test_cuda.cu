@@ -59,6 +59,7 @@ int main(void)
     }
     
     cudaMemcpy(tab, tabCPU, ROW_NUM*COLUMN_NUM*sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(result, resultCPU, ROW_NUM*sizeof(int), cudaMemcpyHostToDevice);
     
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
