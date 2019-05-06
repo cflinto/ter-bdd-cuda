@@ -42,8 +42,8 @@ int main(void)
     int *tab, *result; // GPU
     int *tabCPU, *resultCPU; // CPU
     
-    tabCPU = new int[ROW_NUM*COLUMN_NUM];
-    resultCPU = new int[ROW_NUM];
+    tabCPU = (int*)malloc(ROW_NUM*COLUMN_NUM*sizeof(int));
+    resultCPU = (int*)malloc(ROW_NUM*sizeof(int));
     
     cudaMalloc(&tab, ROW_NUM*COLUMN_NUM*sizeof(int));
     cudaMalloc(&result, ROW_NUM*sizeof(int));
@@ -99,8 +99,8 @@ int main(void)
     cudaFree(tab);
     cudaFree(result);
     
-    delete[] resultCPU;
-    delete[] tabCPU;
+    free(resultCPU);
+    free(tabCPU);
       
     return 0;
 }
