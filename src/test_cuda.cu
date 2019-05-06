@@ -14,7 +14,9 @@ void request(int *tab, int *result)
     int stride = blockDim.x * gridDim.x;
     for (int i = index; i < ROW_NUM; i += stride)
     {
-        if(result[i] < 10000)
+        if(tab[i] > 1000 && tab[i] < 100000
+        && tab[i+ROW_NUM] > 1000 && tab[i+ROW_NUM] < 100000
+        && tab[i+ROW_NUM*2] > 1000 && tab[i+ROW_NUM*2] < 100000)
         {
             result[i] = 1;
         }
@@ -42,11 +44,13 @@ int main(void)
     cudaMallocManaged(&tab, ROW_NUM*COLUMN_NUM*sizeof(int));
     cudaMallocManaged(&result, ROW_NUM*sizeof(int));
     
+    srand(0);
+    
     for(int column=0;column<COLUMN_NUM-1;++column)
     {
         for(int row=0;row<ROW_NUM;++row)
         {
-            tab[ROW_NUM*column+row] = 23*row+column+13*row*row;
+            tab[ROW_NUM*column+row] = rand()%1000000;
         }
     }
     
