@@ -14,7 +14,7 @@ void request(int *tab, int *result)
     int stride = blockDim.x * gridDim.x;
     for (int i = index; i < ROW_NUM; i += stride)
     {
-        if(result[i] > 10000)
+        if(result[i] < 10000)
         {
             result[i] = 1;
         }
