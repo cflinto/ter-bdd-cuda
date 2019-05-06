@@ -124,7 +124,7 @@ int main(void)
     cudaMemcpy(d_x, x, ROW_NUM*COLUMN_NUM*sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_y, y, ROW_NUM*sizeof(int), cudaMemcpyHostToDevice);
 
-    request<<<(ROW_NUM+255)/256, 256>>>(tab, result);
+    request<<<(ROW_NUM+255)/256, 256>>>(d_x, d_y);
 
     cudaMemcpy(y, d_y, ROW_NUM*sizeof(float), cudaMemcpyDeviceToHost);
 
