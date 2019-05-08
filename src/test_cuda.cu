@@ -7,6 +7,8 @@
 #define ROW_NUM 10000100
 #define COLUMN_NUM 4
 
+#define CONSTRAINT_MAX 100000
+
 __global__
 void request(int *tab, int *result)
 {
@@ -14,9 +16,9 @@ void request(int *tab, int *result)
     int stride = blockDim.x * gridDim.x;
     for (int i = index; i < ROW_NUM; i += stride)
     {
-        if(tab[i] > 1000 && tab[i] < 100000
-        && tab[i+ROW_NUM] > 1000 && tab[i+ROW_NUM] < 100000
-        && tab[i+ROW_NUM*2] > 1000 && tab[i+ROW_NUM*2] < 100000)
+        if(tab[i] > 1000 && tab[i] < CONSTRAINT_MAX
+        && tab[i+ROW_NUM] > 1000 && tab[i+ROW_NUM] < CONSTRAINT_MAX
+        && tab[i+ROW_NUM*2] > 1000 && tab[i+ROW_NUM*2] < CONSTRAINT_MAX)
         {
             result[i] = 1;
         }
@@ -138,7 +140,7 @@ int main(void)
     float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
     
-    int total = 0;
+    /*int total = 0;
     for(int row=0;row<ROW_NUM;++row)
     {
         if(resultCPU[row])
@@ -146,7 +148,7 @@ int main(void)
             ++total;
         }
     }
-    std::cout << "Total : " << total << std::endl;
+    std::cout << "Total : " << total << std::endl;*/
     
     
     std::cout << milliseconds;
